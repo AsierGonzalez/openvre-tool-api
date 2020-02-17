@@ -111,7 +111,7 @@ Author: BSC Team
 Author: BSC Team
 
 - Structure:
-    mg-tool-api-versionX
+    openvre-tool-api-versionX
     \apps
         __init__.py
         localapp.py
@@ -142,7 +142,7 @@ Author: BSC Team
         """
         output_file = "/path/to/output_file"
     - Run method has to call _taskMethod
-- Create a new package with basic modules instead of having original classes in the root of mg-tool-api
+- Create a new package with basic modules instead of having original classes in the root of openvre-tool-api
 - Write tools in different files.
 - The tools should be in different files: Relative imports are not recommended: https://www.python.org/dev/peps/pep-0008/
 - Recommended code stype: https://www.python.org/dev/peps/pep-0008/

@@ -20,7 +20,7 @@ import sys
 import datetime
 
 """
-This is the logging facility of the mg-tool-api. It is meant to provide
+This is the logging facility of the openvre-tool-api. It is meant to provide
 a unified way for Tools to log information that needs to be read by the
 VRE (e.g. information about progress, errors, exceptions, etc.).
 

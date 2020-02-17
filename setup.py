@@ -18,13 +18,13 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='mg-tool-api',
+    name='openvre-tool-api',
 
     version='0.5',
     description='MuG Tool API',
 
     url='http://www.multiscalegenomics.eu',
-    download_url='https://github.com/Multiscale-Genomics/mg-tool-api',
+    download_url='https://github.com/Multiscale-Genomics/openvre-tool-api',
 
     author='Marco Pasi, Javier Conejero',
     author_email='',

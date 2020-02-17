@@ -1,6 +1,6 @@
-# mg-tool-api
+# openvre-tool-api
 
-[![Documentation Status](https://readthedocs.org/projects/mg-tool-api/badge/?version=latest)](http://mg-tool-api.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.org/Multiscale-Genomics/mg-tool-api.svg?branch=master)](https://travis-ci.org/Multiscale-Genomics/mg-tool-api)
+[![Documentation Status](https://readthedocs.org/projects/openvre-tool-api/badge/?version=latest)](http://mg-tool-api.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.org/Multiscale-Genomics/mg-tool-api.svg?branch=master)](https://travis-ci.org/Multiscale-Genomics/mg-tool-api)
 
 ## Introduction
 This library implements the specifications detailed in the
@@ -28,7 +28,7 @@ straightforward to combine them in Workflows; in particular by using COMPSs
 "task" decorator and the COMPSs runtime as the workflow scheduler.
 
 ## Implementation overview
-The 'basic_modules' contains the basic entities of mg-tool-api:
+The 'basic_modules' contains the basic entities of openvre-tool-api:
 1. Tool:
 	Is the top-level wrapper for tools within the VRE; each tool is defined
 	by its input and output formats, and by its specific requirements on the
@@ -59,7 +59,7 @@ The 'basic_modules' contains the basic entities of mg-tool-api:
    Class that contains extra information about files.
 
 The 'utils' module contains useful functions for performing common tasks in Tool
-execution. In particular it contains 'logger', the logging facility of mg-tool-api;
+execution. In particular it contains 'logger', the logging facility of openvre-tool-api;
 it provides a unified way of sending messages to the VRE.
 
 See the documentation for the classes for more information.
