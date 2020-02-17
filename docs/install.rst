@@ -37,14 +37,14 @@ Directly from GitHub:
 .. code-block:: none
    :linenos:
 
-   git clone https://github.com/Multiscale-Genomics/openvre-tool-api.git
+   git clone https://github.com/inab/openvre-tool-api.git
 
 Using pip:
 
 .. code-block:: none
    :linenos:
 
-   pip install git+https://github.com/Multiscale-Genomics/openvre-tool-api.git
+   pip install git+https://github.com/inab/openvre-tool-api.git
 
 
 Documentation

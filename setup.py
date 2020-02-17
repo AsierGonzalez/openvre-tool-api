@@ -23,8 +23,8 @@ setup(
     version='0.5',
     description='MuG Tool API',
 
-    url='http://www.multiscalegenomics.eu',
-    download_url='https://github.com/Multiscale-Genomics/openvre-tool-api',
+    url='http://www.bsc.es',
+    download_url='https://github.com/inab/openvre-tool-api',
 
     author='Marco Pasi, Javier Conejero',
     author_email='',
