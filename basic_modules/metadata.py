@@ -55,14 +55,6 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
             meta_data = {}
         self.meta_data = meta_data
 
-    def __repr__(self):
-        return """<Metadata:
-            data_type: {md.data_type}
-            file_type: {md.file_type}
-            file_path: {md.file_path}
-            sources: {md.sources}
-            meta_data: {md.meta_data}>""".format(md=self)
-
     @classmethod
     def get_child(cls, parents, path):
         """
