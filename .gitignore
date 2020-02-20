@@ -5,3 +5,5 @@
 *.DS_Store
 *_build*
 .pytest_cache
+./.idea
+venv
