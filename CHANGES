@@ -12,137 +12,18 @@ Author: WHO?
 - Change N.
 
 **********
-31/05/2018
+20/02/2020
 **********
-Author: Mark McDowall
+Author: Laura Rodriguez Navas
 
-- Added Tests for the logger
-- Changed the functionality of the PROGRESS logger so that it is more flexible and can be used within the VRE
+- Version 0.1
+- Removed def __repr__(self) from Metadata class
 
 **********
-26/10/2017
+17/02/2020
 **********
-Author: Marco Pasi
+Author: Laura Rodriguez Navas
 
-- Version 0.6
-- Added utils.logger interface
-- Modified all examples to use utils.logger:
-  basic_modules.tool, tools_demos/*.py, summer_demo*
-- removed datatypes.py
+- Version 0.1
+- removed taxon_id from metadata.py and jsonapp.py
 - updated README.md
-
-**********
-04/10/2017
-**********
-Author: Marco Pasi
-
-- input_metadata.json defines "sources" instead of "source_id"
-
-
-**********
-06/10/2017
-**********
-Author: Marco Pasi
-
-- JSONApp receives absolute paths; root_dir dumped
-
-
-**********
-22/09/2017
-**********
-Author: Marco Pasi
-
-- Metadata deals exclusively with file paths (no file IDs)
-- App <-> Tool communication now relies on dicts rather than lists
-- added utils.remap: syntactic sugar for dict manipulation in Workflows
-- JSONApp handles "allow_multiple" input and output files
-- added summer_demo2: it uses SimpleTool3, which outputs a variable number of output files
-
-
-**********
-06/09/2017
-**********
-Author: Marco Pasi
-
-- added pycompss conditional imports
-- JSONApp uses JSONs from VRE to configure Tool runs
-- summer_demo uses JSONApp
-
-
-**********
-04/07/2017
-**********
-Author: Mark McDowall
-
-- Merged in documentation and setup
-- Updated to version 0.5.
-
-
-**********
-24/05/2017
-**********
-Author: BSC Team
-
-- Created a tools demos folder.
-- Added summer tools to tools demos.
-- Added new skeleton application "MYAPP.py" for educational purposes.
-- Added a script for running the summer demo and provide a hint on MYAPP execution.
-- Added cleaning script. Removes *.pyc and demo out files (use with care).
-- Updated to version 0.4.
-
-
-**********
-23/05/2017
-**********
-Author: BSC Team
-
-- The project has been reestructured in order to ease the comprehension of the application template.
-- A generic launcher for testing the demo application with PyCOMPSs has been included.
-- The DMG Api has been removed from the project.
-- The code has been cleaned.
-- The documentation has been also cleaned.
-- Updated to version 0.3.
-- Compliant with pep8 style.
-
-
-**********
-16/12/2016
-**********
-Author: BSC Team
-
-- Structure:
-    openvre-tool-api-versionX
-    \apps
-        __init__.py
-        localapp.py
-        pycompssapp.py
-        workflowapp.py
-    \basic_modules
-        __init__.py
-        app.py
-        datatypes.py
-        metadata.py
-        tool.py
-        workflow.py
-    \examples
-        summer.py
-        simpleTool1.py
-        simpleTool2.py
-- Workflow can not inherit from tool. Because:
-    - Workflow is composed by a set of tools.
-    - Nesting problem appears.
-- tool.py:
-    - output_file parameter should be in the signature of the funcion _taskMethod and FILE_OUT parameter should not be returned by the function. Example:
-    @task(input_file = FILE_IN, output_file = FILE_OUT, isModifier = False)
-    def _taskMethod(self, input_file, output_file):
-        """
-        This method performs the actions required to achieve the Tool's
-        functionality. Note the use of the "@task" and "@constraint"
-        decorators.
-        """
-        output_file = "/path/to/output_file"
-    - Run method has to call _taskMethod
-- Create a new package with basic modules instead of having original classes in the root of openvre-tool-api
-- Write tools in different files.
-- The tools should be in different files: Relative imports are not recommended: https://www.python.org/dev/peps/pep-0008/
-- Recommended code stype: https://www.python.org/dev/peps/pep-0008/
