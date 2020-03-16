@@ -28,8 +28,8 @@ try:
         raise ImportError
     from pycompss.api.api import compss_wait_on
 except ImportError:
-    print("[Warning] Cannot import \"pycompss\" API packages.")
-    print("          Using mock decorators.")
+    # print("[Warning] Cannot import \"pycompss\" API packages.")
+    # print("          Using mock decorators.")
 
     from utils.dummy_pycompss import compss_wait_on
 
