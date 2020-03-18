@@ -1,13 +1,8 @@
 # openvre-tool-api
 
-[![Documentation Status](https://readthedocs.org/projects/openvre-tool-api/badge/?version=latest)](http://mg-tool-api.readthedocs.io/en/latest/?badge=latest) [![Build Status](https://travis-ci.org/Multiscale-Genomics/mg-tool-api.svg?branch=master)](https://travis-ci.org/Multiscale-Genomics/mg-tool-api)
-
 ## Introduction
-This library implements the specifications detailed in the
-current version (23/09/2016) of the Deliverable 6.1 document: "Design of
-computational architecture of software modules" (http://bit.ly/MuGD6_1). It
-extends the above document with the aim to provide a simple programming
-paradigm to develop tools for the MuG VRE.
+This library implements the specifications of a new tool in the [openVRE](https://github.com/inab/openVRE.git) enviroment.
+It provides a simple programming paradigm to develop tools for the VRE.
 
 The main goals that this proposal aims to achieve are:
 
@@ -17,15 +12,15 @@ Data Management Plan (DMP). Tools are implemented as a thin wrappers over
 existing software, in order to facilitate integrating existing tools in the
 VRE.
 
-2. Achieve vertical interoperability by using COMPSs, and allowing
+2. Achieve vertical interoperability by using PyCOMPSs, and allowing
 developers to specify the execution enviroment requirements for each tool by
-using COMPSs "constraints" decorator. Although written with task-based
+using PyCOMPSs "constraints" decorator. Although written with task-based
 programming in mind, this library allows execution of Tools outside of the
 COMPSs runtime.
 
 3. Simplify the construction of workflows, by conceiving tools such that it is
-straightforward to combine them in Workflows; in particular by using COMPSs
-"task" decorator and the COMPSs runtime as the workflow scheduler.
+straightforward to combine them in Workflows; in particular by using PyCOMPSs
+"task" decorator and the PyCOMPSs runtime as the workflow scheduler.
 
 ## Implementation overview
 The 'basic_modules' contains the basic entities of openvre-tool-api:
@@ -64,9 +59,16 @@ it provides a unified way of sending messages to the VRE.
 
 See the documentation for the classes for more information.
 
+## Installation
+
+Directly from GitHub:
+
+```bash
+pip install git+https://github.com/inab/openvre-tool-api.git
+```
+
 ## Examples
 
-The "summer_demo.py" and "summer_demo2.py" examples implement workflows using PyCOMPSs.
-They showcase various functionalities of the library by using the mockup Tools
-implemented in the tools_demos module.
+The repository [vre_sample_tool](https://github.com/inab/vre_sample_tool.git) showcase the functionalities of this Wrapper by implementing
+a simple application. It consists on a CWL Tool execution.
 
