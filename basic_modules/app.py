@@ -15,15 +15,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
-from __future__ import print_function
-from basic_modules.metadata import Metadata  # pylint: disable=unused-import
 from utils import logger
 
 
 # -----------------------------------------------------------------------------
 # Main App Interface
 # -----------------------------------------------------------------------------
+
+
 class App(object):  # pylint: disable=too-few-public-methods
     """
     The generic App interface.
@@ -58,7 +57,7 @@ class App(object):  # pylint: disable=too-few-public-methods
 
     def launch(self, tool_class,  # pylint: disable=too-many-arguments
                input_files, input_metadata,
-               output_files, configuration):
+               output_files, configuration, output_metadata):
         """
         Run a Tool with the specified inputs and configuration.
 
@@ -79,17 +78,19 @@ class App(object):  # pylint: disable=too-few-public-methods
         configuration : dict
             a dictionary containing information on how the tool should be
             executed.
-
+        output_metadata : dict
+            a dict of metadatas for each of the output data elements required
+            by the Tool, associated with their role;
 
         Returns
         -------
         (output_files, output_metadata)
-          output_files : dict
-              a dict of absolute path names of the output data elements created
-              by the Tool, associated with their role;
-          output_metadata : dict
-              a dict of metadatas for each of the output data elements created
-              by the Tool, associated with their role.
+              output_files : dict
+                  a dict of absolute path names of the output data elements created
+                  by the Tool, associated with their role;
+              output_metadata : dict
+                  a dict of metadatas for each of the output data elements created
+                  by the Tool, associated with their role.
 
 
         Example
@@ -103,29 +104,30 @@ class App(object):  # pylint: disable=too-few-public-methods
         tool_instance = self._instantiate_tool(tool_class, configuration)
 
         logger.info("2) Run Tool")
-        input_files, input_metadata = self._pre_run(tool_instance,
-                                                    input_files,
+        input_files, input_metadata = self._pre_run(input_files,
                                                     input_metadata)
 
         output_files, output_metadata = tool_instance.run(input_files,
                                                           input_metadata,
-                                                          output_files)
+                                                          output_files,
+                                                          output_metadata)
 
         output_files, output_metadata = self._post_run(tool_instance,
                                                        output_files,
                                                        output_metadata)
 
-        logger.info("Output_files: ", output_files)
         return output_files, output_metadata
 
-    def _instantiate_tool(self, tool_class, configuration):  # pylint: disable=no-self-use
+    @staticmethod
+    def _instantiate_tool(tool_class, configuration):  # pylint: disable=no-self-use
         """
         Instantiate the Tool with its configuration.
         Returns instance of the specified Tool subclass.
         """
         return tool_class(configuration)
 
-    def _pre_run(self, tool_instance, input_files, input_metadata):  # pylint: disable=no-self-use,unused-argument
+    @staticmethod
+    def _pre_run(input_files, input_metadata):  # pylint: disable=no-self-use,unused-argument
         """
         Subclasses can specify here operations to be executed BEFORE running
         Tool.run(); subclasses should also run the superclass _pre_run.

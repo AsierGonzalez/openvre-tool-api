@@ -15,15 +15,16 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
-# -----------------------------------------------------------------------------
-# JSON-configured App
-# -----------------------------------------------------------------------------
 import json
 
 from apps.workflowapp import WorkflowApp
 from basic_modules.metadata import Metadata
 from utils import logger
+
+
+# -----------------------------------------------------------------------------
+# JSON-configured App
+# -----------------------------------------------------------------------------
 
 
 class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
@@ -79,7 +80,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         """
 
         logger.info("0) Unpack information from JSON")
-        input_ids, arguments, output_files = self._read_config(
+        input_ids, arguments, output_files, output_metadata = self._read_config(
             config_path)
 
         input_metadata_ids = self._read_metadata(
@@ -104,7 +105,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         # Run launch from the superclass
         output_files, output_metadata = super(JSONApp, self).launch(
             tool_class, input_files, input_metadata,
-            output_files, arguments)
+            output_files, arguments, output_metadata)
 
         logger.info("4) Pack information to JSON")
         return self._write_results(
@@ -112,12 +113,14 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
             output_files, output_metadata,
             output_metadata_path)
 
-    def _read_config(self, json_path):  # pylint: disable=no-self-use
+    @staticmethod
+    def _read_config(json_path):  # pylint: disable=no-self-use
         """
         Read config.json to obtain:
-        input_ids: dict containing IDs of tool input files
-        arguments: dict containing tool arguments
-        output_files: dict containing absolute paths of tool outputs
+
+            - input_ids: dict containing IDs of tool input files
+            - arguments: dict containing tool arguments
+            - output_files: dict containing absolute paths of tool outputs
 
         Note that values of input_ids may be either str or list,
         according to whether "allow_multiple" is True for the role;
@@ -149,9 +152,12 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         for argument in configuration["arguments"]:
             arguments[argument["name"]] = argument["value"]
 
-        return input_ids, arguments, output_files
+        output_metadata = configuration["output_files"]
 
-    def _read_metadata(self, json_path):  # pylint: disable=no-self-use
+        return input_ids, arguments, output_files, output_metadata
+
+    @staticmethod
+    def _read_metadata(json_path):  # pylint: disable=no-self-use
         """
         Read input_metadata.json to obtain input_metadata_ids, a dict
         containing metadata on each of the tool input files,
@@ -172,15 +178,17 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
             )
         return input_metadata
 
-    def _write_results(self,  # pylint: disable=no-self-use,too-many-arguments
-                       input_files, input_metadata,  # pylint: disable=unused-argument
-                       output_files, output_metadata, json_path):
+    @staticmethod
+    def _write_results(  # pylint: disable=no-self-use,too-many-arguments
+            input_files, input_metadata,  # pylint: disable=unused-argument
+            output_files, output_metadata, json_path):
         """
         Write results.json using information from input_files and output_files:
-        input_files: dict containing absolute paths of input files
-        input_metadata: dict containing metadata on input files
-        output_files: dict containing absolute paths of output files
-        output_metadata: dict containing metadata on output files
+
+            - input_files: dict containing absolute paths of input files
+            - input_metadata: dict containing metadata on input files
+            - output_files: dict containing absolute paths of output files
+            - output_metadata: dict containing metadata on output files
 
         Note that values of output_files may be either str or list,
         according to whether "allow_multiple" is True for the role;
@@ -197,10 +205,10 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         """
         results = []
 
-        def _newresult(role, path, metadata):
+        def _newresult(role, metadata):
             return {
                 "name": role,
-                "file_path": path,
+                "file_path": metadata.file_path,
                 "data_type": metadata.data_type,
                 "file_type": metadata.file_type,
                 "sources": metadata.sources,
@@ -210,22 +218,18 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         for role, path in output_files.items():
             metadata = output_metadata[role]
             if isinstance(path, (list, tuple)):  # check allow_multiple?
-                assert (
-                    isinstance(metadata, (list, tuple)) and
-                    len(metadata) == len(path)
-                ) or isinstance(metadata, Metadata), \
-                        """Wrong number of metadata entries for role {role}:
-either 1 or {np}, not {nm}""".format(role=role, np=len(path), nm=len(metadata))
+                assert (isinstance(metadata, (list, tuple)) and len(metadata) == len(path)) \
+                       or isinstance(metadata, Metadata), """Wrong number of metadata entries for role {role}: either 
+                       1 or {np}, not {nm}""".format(role=role, np=len(path), nm=len(metadata))
 
                 if not isinstance(metadata, (list, tuple)):
                     metadata = [metadata] * len(path)
 
-                results.extend(
-                    [_newresult(role, pa, md) for pa, md in zip(path, metadata)])
+                results.extend([_newresult(role, md) for pa, md in zip(path, metadata)])
+
             else:
                 results.append(
-                    _newresult(role, path, metadata))
-        json.dump(
-            {"output_files": results}, open(json_path, 'w'),
-            indent=4, separators=(',', ': '))
+                    _newresult(role, metadata))
+
+        json.dump({"output_files": results}, open(json_path, 'w'), indent=4, separators=(',', ': '))
         return True
