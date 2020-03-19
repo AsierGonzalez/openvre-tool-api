@@ -1,7 +1,8 @@
 # openvre-tool-api
 
 ## Introduction
-This library implements the specifications of a new tool in the [openVRE](https://github.com/inab/openVRE.git) enviroment.
+This library implements the specifications of a new tool in the 
+[openVRE](https://github.com/inab/openVRE.git) enviroment.
 It provides a simple programming paradigm to develop tools for the VRE.
 
 The main goals that this proposal aims to achieve are:
@@ -69,6 +70,7 @@ pip install git+https://github.com/inab/openvre-tool-api.git
 
 ## Examples
 
-The repository [vre_sample_tool](https://github.com/inab/vre_sample_tool.git) showcase the functionalities of this Wrapper by implementing
-a simple application. It consists on a CWL Tool execution.
+The repository [vre_sample_tool](https://github.com/inab/vre_sample_tool.git) showcase 
+the functionalities of this wrapper by implementing a simple application. 
+It consists on a CWL tool execution.
 
