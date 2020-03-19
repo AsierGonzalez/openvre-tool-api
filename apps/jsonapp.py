@@ -231,5 +231,5 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                 results.append(
                     _newresult(role, metadata))
 
-        json.dump({"output_files": results}, open(json_path, 'w'), indent=4, separators=(',', ': '))
+        json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
         return True
