@@ -20,6 +20,7 @@ import json
 from apps.workflowapp import WorkflowApp
 from basic_modules.metadata import Metadata
 from utils import logger
+from collections import defaultdict
 
 
 # -----------------------------------------------------------------------------
@@ -83,21 +84,27 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         input_ids, arguments, output_files, output_metadata = self._read_config(
             config_path)
 
-        input_metadata_ids = self._read_metadata(
+        input_metadata_ids, input_metadata = self._read_metadata(
             input_metadata_path)
 
-        # arrange by role
-        input_metadata = {}
+        # input files arrange by role
+        input_files_tmp = {}
         for role, input_id in input_ids.items():
-            if isinstance(input_id, (list, tuple)):  # check allow_multiple?
-                input_metadata[role] = [input_metadata_ids[el] for el in input_id]
+            if isinstance(input_id, (list, tuple)):
+                input_files_tmp[role] = [input_metadata_ids[el] for el in input_id]
             else:
-                input_metadata[role] = input_metadata_ids[input_id]
+                input_files_tmp[role] = input_metadata_ids[input_id]
+
+        # input metadata arrange by role
+        for role, input_id in input_ids.items():
+            for key in input_metadata.keys():
+                if key == input_id:
+                    input_metadata[role] = input_metadata.pop(key)
 
         # get paths from IDs
         input_files = {}
-        for role, metadata in input_metadata.items():
-            if isinstance(metadata, (list, tuple)):  # check allow_multiple?
+        for role, metadata in input_files_tmp.items():
+            if isinstance(metadata, (list, tuple)):
                 input_files[role] = [el.file_path for el in metadata]
             else:
                 input_files[role] = metadata.file_path
@@ -166,17 +173,23 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         For more information see the schema for input_metadata.json.
         """
         metadata = json.load(open(json_path))
-        input_metadata = {}
+        input_metadata_ids = {}
+        input_metadata = defaultdict(list)
         for input_file in metadata:
             input_id = input_file["_id"]
-            input_metadata[input_id] = Metadata(
+            input_type = input_file["type"]
+            meta = Metadata(
                 data_type=input_file["data_type"],
                 file_type=input_file["file_type"],
                 file_path=input_file["file_path"],
                 meta_data=input_file["meta_data"],
                 sources=input_file["sources"]
             )
-        return input_metadata
+            input_metadata_ids[input_id] = meta
+            input_metadata[input_id].append(input_type)
+            input_metadata[input_id].append(meta)
+
+        return input_metadata_ids, input_metadata
 
     @staticmethod
     def _write_results(  # pylint: disable=no-self-use,too-many-arguments
@@ -231,5 +244,5 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                 results.append(
                     _newresult(role, metadata))
 
-        json.dump({"output_files": results}, open(json_path, 'w'), indent=4, separators=(',', ': '))
+        json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
         return True
