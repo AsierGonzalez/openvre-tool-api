@@ -17,6 +17,8 @@
 """
 from utils import logger
 
+# Needed to ensure backward compatibility
+import inspect
 
 # -----------------------------------------------------------------------------
 # Main App Interface
@@ -107,10 +109,16 @@ class App(object):  # pylint: disable=too-few-public-methods
         input_files, input_metadata = self._pre_run(input_files,
                                                     input_metadata)
 
-        output_files, output_metadata = tool_instance.run(input_files,
-                                                          input_metadata,
-                                                          output_files,
-                                                          output_metadata)
+        
+        if len(inspect.signature(tool_instance.run).parameters) == 3:
+            output_files, output_metadata = tool_instance.run(input_files,
+                                                              input_metadata,
+                                                              output_files)
+        else:
+            output_files, output_metadata = tool_instance.run(input_files,
+                                                              input_metadata,
+                                                              output_files,
+                                                              output_metadata)
 
         output_files, output_metadata = self._post_run(tool_instance,
                                                        output_files,
