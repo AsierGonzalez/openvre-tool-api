@@ -183,10 +183,10 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                 file_type=input_file["file_type"],
                 file_path=input_file["file_path"],
                 meta_data=input_file["meta_data"],
-                sources=input_file["sources"]
+                sources=input_file["sources"],
+                p_type=input_type
             )
             input_metadata_ids[input_id] = meta
-            input_metadata[input_id].append(input_type)
             input_metadata[input_id].append(meta)
 
         return input_metadata_ids, input_metadata

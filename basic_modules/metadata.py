@@ -25,7 +25,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
     Object containing all information pertaining to a specific data element.
     """
     def __init__(self, data_type=None, file_type=None, file_path=None,  # pylint: disable=too-many-arguments
-                 sources=None, meta_data=None):
+                 sources=None, meta_data=None, p_type=None):
         """
         Initialise the Metadata; for more information see the documentation for
         the MuG DMP API.
@@ -48,6 +48,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
         self.data_type = data_type
         self.file_type = file_type
         self.file_path = file_path
+        self.type = p_type
         if sources is None:
             sources = []
         self.sources = sources
