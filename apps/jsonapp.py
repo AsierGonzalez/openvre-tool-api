@@ -177,7 +177,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         input_metadata = defaultdict(list)
         for input_file in metadata:
             input_id = input_file["_id"]
-            input_type = input_file["type"]
+            input_type = input_file.get("type","file")
             meta = Metadata(
                 data_type=input_file["data_type"],
                 file_type=input_file["file_type"],
