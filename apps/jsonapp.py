@@ -111,7 +111,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
         # Run launch from the superclass
         output_files, output_metadata = super(JSONApp, self).launch(
-            tool_class, input_files, input_metadata,
+            tool_class, input_files, input_metadata_ids,
             output_files, arguments, output_metadata)
 
         logger.info("4) Pack information to JSON")
@@ -187,6 +187,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                 p_type=input_type
             )
             input_metadata_ids[input_id] = meta
+            input_metadata[input_id].append(input_type)
             input_metadata[input_id].append(meta)
 
         return input_metadata_ids, input_metadata
