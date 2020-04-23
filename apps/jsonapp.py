@@ -15,6 +15,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
+import itertools
 import json
 
 from apps.workflowapp import WorkflowApp
@@ -177,7 +178,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         input_metadata = defaultdict(list)
         for input_file in metadata:
             input_id = input_file["_id"]
-            input_type = input_file.get("type","file")
+            input_type = input_file.get("type", "file")
             meta = Metadata(
                 data_type=input_file["data_type"],
                 file_type=input_file["file_type"],
@@ -216,33 +217,83 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
         For more information see the schema for results.json.
         """
-        results = []
 
-        def _newresult(role, metadata):
-            return {
-                "name": role,
-                "file_path": metadata.file_path,
-                "data_type": metadata.data_type,
-                "file_type": metadata.file_type,
-                "sources": metadata.sources,
-                "meta_data": metadata.meta_data
-            }
+        @staticmethod
+        def _write_results(  # pylint: disable=no-self-use,too-many-arguments
+                input_files, input_metadata,  # pylint: disable=unused-argument
+                output_files, output_metadata, json_path):
+            """
+            Write results.json using information from input_files and output_files:
 
-        for role, path in output_files.items():
-            metadata = output_metadata[role]
-            if isinstance(path, (list, tuple)):  # check allow_multiple?
-                assert (isinstance(metadata, (list, tuple)) and len(metadata) == len(path)) \
-                       or isinstance(metadata, Metadata), """Wrong number of metadata entries for role {role}: either 
-                       1 or {np}, not {nm}""".format(role=role, np=len(path), nm=len(metadata))
+                - input_files: dict containing absolute paths of input files
+                - input_metadata: dict containing metadata on input files
+                - output_files: dict containing absolute paths of output files
+                - output_metadata: dict containing metadata on output files
 
-                if not isinstance(metadata, (list, tuple)):
-                    metadata = [metadata] * len(path)
+            Note that values of output_files may be either str or list,
+            according to whether "allow_multiple" is True for the role;
+            in which case, the Tool may have generated multiple output
+            files for that role.
 
-                results.extend([_newresult(role, md) for pa, md in zip(path, metadata)])
+            Values of output_metadata for roles for which "allow_multiple"
+            is True can be either a list of instances of Metadata, or a
+            single instance. In the former case, the list is assumed to be
+            the same length as that in output_files. In the latter, the same
+            instance of Metadata is used for all outputs for that role.
 
-            else:
-                results.append(
-                    _newresult(role, metadata))
+            For more information see the schema for results.json.
+            """
+            results = []
 
-        json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
-        return True
+            def _newresult(role, path, metadata):
+                return {
+                    "name": role,
+                    "file_path": path,
+                    "data_type": metadata.data_type,
+                    "file_type": metadata.file_type,
+                    "sources": metadata.sources,
+                    "meta_data": metadata.meta_data
+                }
+
+            # for role, path in output_files.items():
+            for role, path in (
+                    itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
+                # metadata = output_metadata[role]
+                for metadata in output_metadata:
+                    name = metadata["name"]
+                    if name == role:
+                        meta = Metadata()  # create object metadata
+
+                        # if isinstance(path, (list, tuple)):  # check allow_multiple?
+                        #     assert (isinstance(metadata, (list, tuple)) and len(metadata) == len(path)) \
+                        #            or isinstance(metadata, Metadata), """Wrong number of metadata entries for role {role}: either
+                        #            1 or {np}, not {nm}""".format(role=role, np=len(path), nm=len(metadata))
+                        #
+                        #     if not isinstance(metadata, (list, tuple)):
+                        #         metadata = [metadata] * len(path)
+                        #
+                        #     results.extend([_newresult(role, md) for pa, md in zip(path, metadata)])
+
+                        # else:
+                        # Set file_path
+                        meta.file_path = path
+                        # Set data and file types of output_file
+                        meta.data_type = metadata["file"].get("data_type", None)
+                        meta.file_type = metadata["file"].get("file_type", None)
+
+                        # Set sources for output file from input_metadata
+                        meta_sources_list = list()
+                        for input_name in input_metadata.keys():
+                            meta_sources_list.append(input_metadata[input_name][1].file_path)
+
+                        meta.sources = meta_sources_list
+
+                        # Set output file metadata
+                        meta.meta_data = metadata["file"].get("meta_data", None)
+
+                        results.append(
+                            _newresult(role, path, meta))
+
+            print(json.dumps({"output_files": results}, indent=2))
+            json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
+            return True
