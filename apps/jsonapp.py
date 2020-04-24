@@ -15,8 +15,8 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-import itertools
 import json
+import itertools
 
 from apps.workflowapp import WorkflowApp
 from basic_modules.metadata import Metadata
@@ -229,7 +229,8 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         def _newresult(role, path, metadata):
             return {
                 "name": role,
-                "file_path": path,
+                "type": path[1],
+                "file_path": path[0],
                 "data_type": metadata.data_type,
                 "file_type": metadata.file_type,
                 "sources": metadata.sources,
@@ -237,14 +238,13 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
             }
 
         for role, path in (
-        itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
+                itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
             for metadata in output_metadata:
                 name = metadata["name"]
                 if name == role:
                     meta = Metadata()  # Create object metadata
-
-                    # Set file_path
-                    meta.file_path = path
+                    meta.type = path[1]  # Set type of file
+                    meta.file_path = path[0]  # Set file_path
 
                     # Set data and file types of output_file
                     meta.data_type = metadata["file"].get("data_type", None)

@@ -24,7 +24,8 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
     """
     Object containing all information pertaining to a specific data element.
     """
-    def __init__(self, data_type=None, file_type=None, file_path=None,  # pylint: disable=too-many-arguments
+
+    def __init__(self, type=None, data_type=None, file_type=None, file_path=None,  # pylint: disable=too-many-arguments
                  sources=None, meta_data=None):
         """
         Initialise the Metadata; for more information see the documentation for
@@ -33,6 +34,8 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
 
         Parameters
         ----------
+        type : str
+            The type of data
         data_type : str
             The type of information in the file
         file_type : str
@@ -45,6 +48,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
             Dictionary object containing the extra data related to the
             generation of the file or describing the way it was processed
         """
+        self.type = type
         self.data_type = data_type
         self.file_type = file_type
         self.file_path = file_path
@@ -61,7 +65,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
         Generate a stub for the metadata of a new data element generated
         from the data element described in the specified parents.
 
-        Fields "data_type" and "file_type" are taken from the first parent; the
+        Fields "type", "data_type" and "file_type" are taken from the first parent; the
         "meta_data" fields are merged from all parents, in their respective
         order (i.e. values in the last parent prevail).
 
@@ -96,7 +100,8 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
         for parent in parents[1:]:
             meta_data.update(parent.meta_data)
 
-        return cls(parents[0].data_type,
+        return cls(parents[0].type,
+                   parents[0].data_type,
                    parents[0].file_type,
                    path,
                    sources=[parent.file_path for parent in parents],
