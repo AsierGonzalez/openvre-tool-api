@@ -152,15 +152,21 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
             else:
                 input_ids[role] = input_id
 
+        output_configuration = configuration["output_files"]
+        output_metadata = output_configuration
+
         output_files = {}
-        for output_file in configuration["output_files"]:
-            output_files[output_file["name"]] = output_file["file"].get("file_path", None)
+        # TODO delete in the future
+        for output_file in output_configuration:
+            file_path = output_file["file"].get("file_path", None)
+            if file_path is not None:  # exists file path
+                output_files[output_file["name"]] = file_path
+            else:  # not exists file path
+                output_files[output_file["name"]] = None
 
         arguments = {}
         for argument in configuration["arguments"]:
             arguments[argument["name"]] = argument["value"]
-
-        output_metadata = configuration["output_files"]
 
         return input_ids, arguments, output_files, output_metadata
 
@@ -255,28 +261,16 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                     "meta_data": metadata.meta_data
                 }
 
-            # for role, path in output_files.items():
             for role, path in (
-                    itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
-                # metadata = output_metadata[role]
+            itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
                 for metadata in output_metadata:
                     name = metadata["name"]
                     if name == role:
-                        meta = Metadata()  # create object metadata
+                        meta = Metadata()  # Create object metadata
 
-                        # if isinstance(path, (list, tuple)):  # check allow_multiple?
-                        #     assert (isinstance(metadata, (list, tuple)) and len(metadata) == len(path)) \
-                        #            or isinstance(metadata, Metadata), """Wrong number of metadata entries for role {role}: either
-                        #            1 or {np}, not {nm}""".format(role=role, np=len(path), nm=len(metadata))
-                        #
-                        #     if not isinstance(metadata, (list, tuple)):
-                        #         metadata = [metadata] * len(path)
-                        #
-                        #     results.extend([_newresult(role, md) for pa, md in zip(path, metadata)])
-
-                        # else:
                         # Set file_path
                         meta.file_path = path
+
                         # Set data and file types of output_file
                         meta.data_type = metadata["file"].get("data_type", None)
                         meta.file_type = metadata["file"].get("file_type", None)
@@ -291,9 +285,11 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                         # Set output file metadata
                         meta.meta_data = metadata["file"].get("meta_data", None)
 
-                        results.append(
-                            _newresult(role, path, meta))
+                        results.append(_newresult(role, path, meta))
 
+            logger.debug("Output files.")
             print(json.dumps({"output_files": results}, indent=2))
+
+            # Create JSON output_metadata file
             json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
             return True
