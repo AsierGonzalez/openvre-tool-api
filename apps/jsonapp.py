@@ -223,73 +223,47 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
         For more information see the schema for results.json.
         """
+        results = []
 
-        @staticmethod
-        def _write_results(  # pylint: disable=no-self-use,too-many-arguments
-                input_files, input_metadata,  # pylint: disable=unused-argument
-                output_files, output_metadata, json_path):
-            """
-            Write results.json using information from input_files and output_files:
+        def _newresult(role, path, metadata):
+            return {
+                "name": role,
+                "file_path": path,
+                "data_type": metadata.data_type,
+                "file_type": metadata.file_type,
+                "sources": metadata.sources,
+                "meta_data": metadata.meta_data
+            }
 
-                - input_files: dict containing absolute paths of input files
-                - input_metadata: dict containing metadata on input files
-                - output_files: dict containing absolute paths of output files
-                - output_metadata: dict containing metadata on output files
+        for role, path in (
+        itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
+            for metadata in output_metadata:
+                name = metadata["name"]
+                if name == role:
+                    meta = Metadata()  # Create object metadata
 
-            Note that values of output_files may be either str or list,
-            according to whether "allow_multiple" is True for the role;
-            in which case, the Tool may have generated multiple output
-            files for that role.
+                    # Set file_path
+                    meta.file_path = path
 
-            Values of output_metadata for roles for which "allow_multiple"
-            is True can be either a list of instances of Metadata, or a
-            single instance. In the former case, the list is assumed to be
-            the same length as that in output_files. In the latter, the same
-            instance of Metadata is used for all outputs for that role.
+                    # Set data and file types of output_file
+                    meta.data_type = metadata["file"].get("data_type", None)
+                    meta.file_type = metadata["file"].get("file_type", None)
 
-            For more information see the schema for results.json.
-            """
-            results = []
+                    # Set sources for output file from input_metadata
+                    meta_sources_list = list()
+                    for input_name in input_metadata.keys():
+                        meta_sources_list.append(input_metadata[input_name][1].file_path)
 
-            def _newresult(role, path, metadata):
-                return {
-                    "name": role,
-                    "file_path": path,
-                    "data_type": metadata.data_type,
-                    "file_type": metadata.file_type,
-                    "sources": metadata.sources,
-                    "meta_data": metadata.meta_data
-                }
+                    meta.sources = meta_sources_list
 
-            for role, path in (
-            itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
-                for metadata in output_metadata:
-                    name = metadata["name"]
-                    if name == role:
-                        meta = Metadata()  # Create object metadata
+                    # Set output file metadata
+                    meta.meta_data = metadata["file"].get("meta_data", None)
 
-                        # Set file_path
-                        meta.file_path = path
+                    results.append(_newresult(role, path, meta))
 
-                        # Set data and file types of output_file
-                        meta.data_type = metadata["file"].get("data_type", None)
-                        meta.file_type = metadata["file"].get("file_type", None)
+        logger.debug("Output files.")
+        print(json.dumps({"output_files": results}, indent=2))
 
-                        # Set sources for output file from input_metadata
-                        meta_sources_list = list()
-                        for input_name in input_metadata.keys():
-                            meta_sources_list.append(input_metadata[input_name][1].file_path)
-
-                        meta.sources = meta_sources_list
-
-                        # Set output file metadata
-                        meta.meta_data = metadata["file"].get("meta_data", None)
-
-                        results.append(_newresult(role, path, meta))
-
-            logger.debug("Output files.")
-            print(json.dumps({"output_files": results}, indent=2))
-
-            # Create JSON output_metadata file
-            json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
-            return True
+        # Create JSON output_metadata file
+        json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
+        return True
