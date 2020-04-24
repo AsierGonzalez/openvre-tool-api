@@ -158,11 +158,12 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         output_files = {}
         # TODO delete in the future
         for output_file in output_configuration:
-            file_path = output_file["file"].get("file_path", None)
-            if file_path is not None:  # exists file path
-                output_files[output_file["name"]] = file_path
-            else:  # not exists file path
-                output_files[output_file["name"]] = None
+            if output_file["name"] != "cwl_metadata":  # TODO delete
+                file_path = output_file["file"].get("file_path", None)
+                if file_path is not None:  # exists file path
+                    output_files[output_file["name"]] = file_path
+                else:  # not exists file path
+                    output_files[output_file["name"]] = None
 
         arguments = {}
         for argument in configuration["arguments"]:
