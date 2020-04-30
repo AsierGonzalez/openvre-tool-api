@@ -158,12 +158,11 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         output_files = {}
         # TODO delete in the future
         for output_file in output_configuration:
-            if output_file["name"] != "cwl_metadata":  # TODO delete
-                file_path = output_file["file"].get("file_path", None)
-                if file_path is not None:  # exists file path
-                    output_files[output_file["name"]] = file_path
-                else:  # not exists file path
-                    output_files[output_file["name"]] = None
+            file_path = output_file["file"].get("file_path", None)
+            if file_path is not None:  # exists file path
+                output_files[output_file["name"]] = file_path
+            else:  # not exists file path
+                output_files[output_file["name"]] = None
 
         arguments = {}
         for argument in configuration["arguments"]:
@@ -227,18 +226,25 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         results = []
 
         def _newresult(role, path, metadata):
-            return {
+
+            result = {
                 "name": role,
                 "type": path[1],
                 "file_path": path[0],
                 "data_type": metadata.data_type,
                 "file_type": metadata.file_type,
+                "compressed": metadata.compressed,
                 "sources": metadata.sources,
                 "meta_data": metadata.meta_data
             }
+            if result["compressed"] is None:    # if not compressed file it is removed the field
+                del result["compressed"]
+
+            return result
 
         for role, path in (
-                itertools.chain.from_iterable([itertools.product((k,), v) for k, v in output_files.items()])):
+                itertools.chain.from_iterable(
+                    [itertools.product((k,), v) for k, v in output_files.items() if v is not None])):
             for metadata in output_metadata:
                 name = metadata["name"]
                 if name == role:
@@ -249,6 +255,9 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                     # Set data and file types of output_file
                     meta.data_type = metadata["file"].get("data_type", None)
                     meta.file_type = metadata["file"].get("file_type", None)
+
+                    if name == "cwl_metadata":
+                        meta.compressed = metadata["file"].get("compressed", None)
 
                     # Set sources for output file from input_metadata
                     meta_sources_list = list()

@@ -26,7 +26,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
     """
 
     def __init__(self, type=None, data_type=None, file_type=None, file_path=None,  # pylint: disable=too-many-arguments
-                 sources=None, meta_data=None):
+                 compressed=None, sources=None, meta_data=None):
         """
         Initialise the Metadata; for more information see the documentation for
         the MuG DMP API.
@@ -42,6 +42,8 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
             File format
         file_path : str
             Relative path of the file
+        compressed :  str
+            File compressed format
         sources : list
             List of paths of files that were processed to generate this file
         meta_data : dict
@@ -52,6 +54,7 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
         self.data_type = data_type
         self.file_type = file_type
         self.file_path = file_path
+        self.compressed = compressed
         if sources is None:
             sources = []
         self.sources = sources
@@ -104,5 +107,6 @@ class Metadata(object):  # pylint: disable=too-few-public-methods
                    parents[0].data_type,
                    parents[0].file_type,
                    path,
+                   parents[0].compressed,
                    sources=[parent.file_path for parent in parents],
                    meta_data=meta_data)
