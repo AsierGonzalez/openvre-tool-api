@@ -17,6 +17,7 @@
 """
 import json
 import itertools
+import os
 
 from apps.workflowapp import WorkflowApp
 from basic_modules.metadata import Metadata
@@ -237,7 +238,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
                 "sources": metadata.sources,
                 "meta_data": metadata.meta_data
             }
-            if result["compressed"] is None:    # if not compressed file it is removed the field
+            if result["compressed"] is None:  # if not compressed file it is removed the field
                 del result["compressed"]
 
             return result
@@ -271,9 +272,12 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
                     results.append(_newresult(role, path, meta))
 
-        logger.debug("Output files.")
+        logger.debug("Output files")
         print(json.dumps({"output_files": results}, indent=2))
 
         # Create JSON output_metadata file
         json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
-        return True
+        if os.path.isfile(json_path):  # check if output_metadata.json was created if not will stop the execution
+            return True
+        else:
+            return False
