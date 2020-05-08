@@ -277,4 +277,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
         # Create JSON output_metadata file
         json.dump({"output_files": results}, open(json_path, 'w'), indent=2, separators=(',', ': '))
-        return True
+        if os.path.isfile(json_path):  # check if results was created, if not execution stops
+            return True
+        else:
+            return False
