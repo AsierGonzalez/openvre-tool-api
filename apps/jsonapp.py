@@ -130,6 +130,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
             - input_ids: dict containing IDs of tool input files
             - arguments: dict containing tool arguments
             - output_files: dict containing absolute paths of tool outputs
+            - output_metadata: dict containing metadata of tool outputs
 
         Note that values of input_ids may be either str or list,
         according to whether "allow_multiple" is True for the role;
@@ -146,12 +147,18 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
         for input_config_id in configuration["input_files"]:
             role = input_config_id["name"]
             input_id = input_config_id["value"]
-            if role in input_ids:
-                if not isinstance(input_ids[role], list):
-                    input_ids[role] = [input_ids[role]]
-                input_ids[role].append(input_id)
+            allow_multiple = input_config_id["allow_multiple"]
+            if role not in input_ids:
+                if allow_multiple:  # allow multiple input files is True
+                    input_ids[role] = [input_id]
+
+                else:  # allow multiple input files is False
+                    input_ids[role] = input_id
+
             else:
-                input_ids[role] = input_id
+                # if not isinstance(input_ids[role], list):
+                #     input_ids[role] = [input_ids[role]]
+                input_ids[role].append(input_id)
 
         output_configuration = configuration["output_files"]
         output_metadata = output_configuration
