@@ -99,7 +99,7 @@ class JSONApp(WorkflowApp):  # pylint: disable=too-few-public-methods
 
         # input metadata arrange by role
         for role, input_id in input_ids.items():
-            for key in input_metadata.keys():
+            for key in list(input_metadata.keys()):
                 if key == input_id:
                     input_metadata[role] = input_metadata.pop(key)
 
